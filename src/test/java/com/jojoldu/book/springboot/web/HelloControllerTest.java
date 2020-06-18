@@ -7,8 +7,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class) // ①
@@ -19,12 +21,26 @@ public class HelloControllerTest {
     private MockMvc mvc; // ➃
 
     @Test
-    public void hello가_리턴된다() throws Exception{
+    public void hello가_리턴된다() throws Exception {
         String hello = "hello";
 
         mvc.perform(get("/hello"))          // ➄
                 .andExpect(status().isOk())           // ➅
                 .andExpect(content().string(hello));  // ➆
+    }
+
+    @Test
+    public void helloDto가_리턴된다() throws Exception {
+        String name = "hello";
+        int amount = 1000;
+
+        mvc.perform(get("/hello/dto")
+                .param("name", name) // ➇
+                .param("amount", String.valueOf(amount)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name", is(name))) // ➈
+                .andExpect(jsonPath("$.amount", is(amount)));
+
     }
 }
 
@@ -50,15 +66,29 @@ public class HelloControllerTest {
 
 /*
  * ➅ .andExpect(status().isOk())
- *   - mvc.perform의 결과를 검증합니다.
- *   - HTTP Header의 Status를 검증합니다.
- *   - 우리가 흔히 알고 있는 200, 404, 500 등의 상태를 검증합니다.
- *   - 여기선 OK 즉, 200인지 아닌지를 검증합니다.
+ *    - mvc.perform의 결과를 검증합니다.
+ *    - HTTP Header의 Status를 검증합니다.
+ *    - 우리가 흔히 알고 있는 200, 404, 500 등의 상태를 검증합니다.
+ *    - 여기선 OK 즉, 200인지 아닌지를 검증합니다.
  */
 
 /*
  * ➆ .andExpect(content().String(hello))
- *   - mvc.perform의 결과를 검증합니다.
- *   - 응답 본문의 내용을 검증합니다.
- *   - Controller에서 "hello"를 리턴하기 때문에 이 값이 맞는지 검증합니다.
+ *    - mvc.perform의 결과를 검증합니다.
+ *    - 응답 본문의 내용을 검증합니다.
+ *    - Controller에서 "hello"를 리턴하기 때문에 이 값이 맞는지 검증합니다.
+ */
+
+/**
+ * ➇ param
+ *    - API 테스트할 때 사용될 요청 파라미터를 설정합니다.
+ *    - 단, 값은 String만 허용됩니다.
+ *    - 그래서 숫자/날짜 등의 데이터도 등록할 때는 문자열로 변경해야만 가능합니다.
+ */
+
+/**
+ * ➈ jsonPath
+ *    - JSON 응답값을 필드별로 검증할 수 있는 메소드입니다.
+ *    - $를 기준으로 필드명을 명시합니다.
+ *    - 여기서는 name과 amount를 검증하니 $.name, $.amount로 검증합니다.
  */
