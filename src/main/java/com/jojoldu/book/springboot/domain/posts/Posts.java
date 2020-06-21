@@ -1,6 +1,5 @@
 package com.jojoldu.book.springboot.domain.posts;
 
-import javafx.geometry.Pos;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,6 +34,11 @@ public class Posts {
         this.title = title;
         this.content = content;
         this.author = author;
+    }
+
+    public void update(String title, String content) {
+        this.title = title;
+        this.content = content;
     }
 
 }
